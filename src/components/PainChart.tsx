@@ -84,13 +84,13 @@ export default function PainChart({ entries }: PainChartProps) {
   }
 
   return (
-    <div className="space-y-8">
-      <div className="bg-white rounded-lg p-6 shadow-sm border">
-        <h3 className="text-xl font-semibold text-gray-800 mb-6">
+    <div className="space-y-6">
+      <div className="card">
+        <h3 className="text-subheading mb-4">
           Evolução da Dor por Região
         </h3>
         
-        <div className="h-96">
+        <div className="h-64 md:h-80">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={mergedData}>
               <CartesianGrid strokeDasharray="3 3" />

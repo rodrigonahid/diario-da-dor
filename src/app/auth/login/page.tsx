@@ -40,46 +40,63 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Entrar</h1>
-          <p className="text-gray-600">Digite seu número de telefone</p>
+    <div className="min-h-screen bg-green-50 flex flex-col">
+      {/* Header */}
+      <div className="safe-area-top bg-white border-b border-gray-100">
+        <div className="flex items-center px-4 py-3">
+          <Link href="/" className="btn-ghost p-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </Link>
+          <h1 className="text-heading ml-2">Entrar</h1>
         </div>
+      </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-              Telefone
-            </label>
-            <input
-              type="tel"
-              id="phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="(11) 99999-9999"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
+      {/* Content */}
+      <div className="flex-1 px-4 py-8">
+        <div className="max-w-sm mx-auto">
+          <div className="text-center mb-8">
+            <p className="text-body">Digite seu número de telefone para acessar sua conta</p>
           </div>
 
-          {error && (
-            <div className="text-red-600 text-sm text-center">{error}</div>
-          )}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                Telefone
+              </label>
+              <input
+                type="tel"
+                id="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="(11) 99999-9999"
+                className="input-field"
+                required
+              />
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-6 rounded-lg transition duration-200"
-          >
-            {loading ? 'Entrando...' : 'Entrar'}
-          </button>
-        </form>
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-red-700 text-sm text-center">{error}</p>
+              </div>
+            )}
 
-        <div className="mt-6 text-center">
-          <Link href="/" className="text-gray-600 hover:text-gray-800">
-            ← Voltar
-          </Link>
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full"
+            >
+              {loading ? 'Entrando...' : 'Entrar'}
+            </button>
+          </form>
+
+          <div className="mt-8 text-center">
+            <p className="text-caption mb-2">Não tem uma conta?</p>
+            <Link href="/auth/register" className="text-green-600 hover:text-green-700 text-sm font-medium">
+              Criar conta
+            </Link>
+          </div>
         </div>
       </div>
     </div>

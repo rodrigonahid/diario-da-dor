@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import Header from '@/components/Header';
 import PainChart from '@/components/PainChart';
 
 interface PainEntry {
@@ -82,107 +82,108 @@ export default function History() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-green-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando histórico...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-body">Carregando histórico...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-4xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-800">Histórico de Dor</h1>
-            <Link
-              href="/dashboard"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
+    <div className="min-h-screen bg-green-50">
+      <Header title="Histórico" />
+      
+      <div className="px-4 py-6">
+        {entries.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <p className="text-body mb-4">Nenhum registro encontrado</p>
+            <p className="text-caption mb-6">Comece registrando sua primeira dor</p>
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="btn-primary"
             >
-              Novo Registro
-            </Link>
+              Criar Primeiro Registro
+            </button>
           </div>
-
-          {entries.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-600 text-lg mb-4">Nenhum registro encontrado</p>
-              <Link
-                href="/dashboard"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition duration-200"
-              >
-                Criar Primeiro Registro
-              </Link>
+        ) : (
+          <div className="space-y-6">
+            {/* Pain Evolution Charts */}
+            <div className="mb-6">
+              <PainChart entries={entries} />
             </div>
-          ) : (
-            <div className="space-y-8">
-              {/* Pain Evolution Charts */}
-              <div className="mb-8">
-                <PainChart entries={entries} />
-              </div>
 
-              {/* Pain Entries List */}
-              <div>
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">Registros Detalhados</h2>
-                <div className="space-y-4">
-                  {entries.map((entry) => (
-                    <div
-                      key={entry.id}
-                      className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                      onClick={() => setSelectedEntry(entry)}
-                    >
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold text-gray-800">
-                              {bodyPartNames[entry.bodyPart] || entry.bodyPart}
-                            </h3>
-                            <span
-                              className={`px-3 py-1 rounded-full text-sm font-medium ${getPainColor(
-                                entry.painLevel
-                              )}`}
-                            >
-                              Nível {entry.painLevel}
-                            </span>
-                          </div>
-                          <p className="text-gray-600 text-sm">
-                            {formatDate(entry.createdAt)}
-                          </p>
+            {/* Pain Entries List */}
+            <div>
+              <h2 className="text-subheading mb-4">Registros Detalhados</h2>
+              <div className="space-y-3">
+                {entries.map((entry) => (
+                  <div
+                    key={entry.id}
+                    className="card hover:shadow-md transition-shadow cursor-pointer"
+                    onClick={() => setSelectedEntry(entry)}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 className="text-body font-medium">
+                            {bodyPartNames[entry.bodyPart] || entry.bodyPart}
+                          </h3>
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${getPainColor(
+                              entry.painLevel
+                            )}`}
+                          >
+                            {entry.painLevel}
+                          </span>
                         </div>
-                        <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                          Ver detalhes →
-                        </button>
+                        <p className="text-caption">
+                          {formatDate(entry.createdAt)}
+                        </p>
                       </div>
+                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
+      {/* Modal for entry details */}
       {selectedEntry && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">Detalhes do Registro</h2>
-              <button
-                onClick={() => setSelectedEntry(null)}
-                className="text-gray-500 hover:text-gray-700 text-2xl"
-              >
-                ×
-              </button>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50 md:items-center">
+          <div className="bg-white rounded-t-2xl md:rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto safe-area-bottom">
+            <div className="sticky top-0 bg-white border-b border-gray-100 px-4 py-3">
+              <div className="flex justify-between items-center">
+                <h2 className="text-subheading">Detalhes do Registro</h2>
+                <button
+                  onClick={() => setSelectedEntry(null)}
+                  className="btn-ghost p-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="p-4 space-y-4">
               <div className="flex items-center gap-3">
-                <h3 className="text-xl font-semibold text-gray-800">
+                <h3 className="text-body font-medium">
                   {bodyPartNames[selectedEntry.bodyPart] || selectedEntry.bodyPart}
                 </h3>
                 <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium ${getPainColor(
+                  className={`px-2 py-1 rounded-full text-xs font-medium ${getPainColor(
                     selectedEntry.painLevel
                   )}`}
                 >
@@ -190,53 +191,53 @@ export default function History() {
                 </span>
               </div>
 
-              <p className="text-gray-600">
+              <p className="text-caption">
                 <strong>Data:</strong> {formatDate(selectedEntry.createdAt)}
               </p>
 
               {selectedEntry.treatmentForm && (
-                <div className="space-y-4 mt-6">
-                  <h4 className="text-lg font-semibold text-gray-800">Informações Adicionais</h4>
+                <div className="space-y-3 mt-4">
+                  <h4 className="text-body font-medium">Informações Adicionais</h4>
                   
                   {selectedEntry.treatmentForm.formData.symptoms && (
                     <div>
-                      <strong className="text-gray-700">Sintomas:</strong>
-                      <p className="text-gray-600 mt-1">{selectedEntry.treatmentForm.formData.symptoms}</p>
+                      <strong className="text-caption">Sintomas:</strong>
+                      <p className="text-body mt-1">{selectedEntry.treatmentForm.formData.symptoms}</p>
                     </div>
                   )}
 
                   {selectedEntry.treatmentForm.formData.duration && (
                     <div>
-                      <strong className="text-gray-700">Duração:</strong>
-                      <p className="text-gray-600 mt-1">{selectedEntry.treatmentForm.formData.duration}</p>
+                      <strong className="text-caption">Duração:</strong>
+                      <p className="text-body mt-1">{selectedEntry.treatmentForm.formData.duration}</p>
                     </div>
                   )}
 
                   {selectedEntry.treatmentForm.formData.triggers && (
                     <div>
-                      <strong className="text-gray-700">Possíveis causas:</strong>
-                      <p className="text-gray-600 mt-1">{selectedEntry.treatmentForm.formData.triggers}</p>
+                      <strong className="text-caption">Possíveis causas:</strong>
+                      <p className="text-body mt-1">{selectedEntry.treatmentForm.formData.triggers}</p>
                     </div>
                   )}
 
                   {selectedEntry.treatmentForm.formData.previousTreatments && (
                     <div>
-                      <strong className="text-gray-700">Tratamentos realizados:</strong>
-                      <p className="text-gray-600 mt-1">{selectedEntry.treatmentForm.formData.previousTreatments}</p>
+                      <strong className="text-caption">Tratamentos realizados:</strong>
+                      <p className="text-body mt-1">{selectedEntry.treatmentForm.formData.previousTreatments}</p>
                     </div>
                   )}
 
                   {selectedEntry.treatmentForm.formData.medications && (
                     <div>
-                      <strong className="text-gray-700">Medicamentos:</strong>
-                      <p className="text-gray-600 mt-1">{selectedEntry.treatmentForm.formData.medications}</p>
+                      <strong className="text-caption">Medicamentos:</strong>
+                      <p className="text-body mt-1">{selectedEntry.treatmentForm.formData.medications}</p>
                     </div>
                   )}
 
                   {selectedEntry.treatmentForm.formData.notes && (
                     <div>
-                      <strong className="text-gray-700">Observações:</strong>
-                      <p className="text-gray-600 mt-1">{selectedEntry.treatmentForm.formData.notes}</p>
+                      <strong className="text-caption">Observações:</strong>
+                      <p className="text-body mt-1">{selectedEntry.treatmentForm.formData.notes}</p>
                     </div>
                   )}
                 </div>
