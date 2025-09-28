@@ -1,26 +1,27 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Header from "@/components/Header";
 
 export default function Register() {
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ name, phone }),
       });
@@ -28,74 +29,95 @@ export default function Register() {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('userId', data.user.id);
-        router.push('/dashboard');
+        // ⚠️ Atenção: Se a rota de login já define o userId,
+        // considere redirecionar para a tela de login aqui
+        // ou garantir que o backend envie a sessão completa.
+        localStorage.setItem("userId", data.user.id);
+        router.push("/dashboard");
       } else {
-        setError(data.error || 'Erro ao criar conta');
+        setError(data.error || "Erro ao criar conta");
       }
     } catch (error) {
-      setError('Erro de conexão');
+      setError("Erro de conexão");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Primeiro Acesso</h1>
-          <p className="text-gray-600">Crie sua conta para começar</p>
-        </div>
+    // 1. Fundo e Layout Principal (Similar ao Login)
+    <div className="min-h-screen bg-green-50 flex flex-col">
+      {/* Header (Mantenha o mesmo setup) */}
+      <Header title="Criar Conta" canGoBack isAuth={false} />
+      {/* ☝️ Note que mudei isAuth para false para permitir o menu lateral no Header, caso necessário, mas para registro, isAuth=true ou false não deve importar se canGoBack estiver ativo. Usei 'Criar Conta' como título. */}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-              Nome Completo
-            </label>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Seu nome completo"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
+      {/* Content (Mantenha o mesmo padding e centralização) */}
+      <div className="flex-1 px-4 py-8">
+        <div className="max-w-sm mx-auto">
+          <div className="text-center mb-8">
+            <p className="text-body">Preencha seus dados para começar a registrar sua dor</p>
           </div>
 
-          <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-              Telefone
-            </label>
-            <input
-              type="tel"
-              id="phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="(11) 99999-9999"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
+          <form onSubmit={handleSubmit} className="space-y-6">
+            
+            {/* Input Nome */}
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                Nome Completo
+              </label>
+              <input
+                type="text"
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Seu nome completo"
+                // 2. CLASSE DE INPUT IDÊNTICA AO LOGIN
+                className="input-field" 
+                required
+              />
+            </div>
+
+            {/* Input Telefone */}
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                Telefone
+              </label>
+              <input
+                type="tel"
+                id="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="(11) 99999-9999"
+                // 2. CLASSE DE INPUT IDÊNTICA AO LOGIN
+                className="input-field"
+                required
+              />
+            </div>
+
+            {/* Mensagem de Erro (Similar ao Login) */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-red-700 text-sm text-center">{error}</p>
+              </div>
+            )}
+
+            {/* Botão de Submit (Similar ao Login) */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary w-full"
+            >
+              {loading ? "Criando conta..." : "Criar Conta"}
+            </button>
+          </form>
+
+          {/* Link de Retorno (Similar ao Login) */}
+          <div className="mt-8 text-center">
+            <p className="text-caption mb-2">Já tem uma conta?</p>
+            <Link href="/" className="text-green-600 hover:text-green-700 text-sm font-medium">
+              Fazer Login
+            </Link>
           </div>
-
-          {error && (
-            <div className="text-red-600 text-sm text-center">{error}</div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-semibold py-3 px-6 rounded-lg transition duration-200"
-          >
-            {loading ? 'Criando conta...' : 'Criar Conta'}
-          </button>
-        </form>
-
-        <div className="mt-6 text-center">
-          <Link href="/" className="text-gray-600 hover:text-gray-800">
-            ← Voltar
-          </Link>
         </div>
       </div>
     </div>

@@ -33,14 +33,7 @@ export async function GET(
       .where(eq(painEntries.userId, userId))
       .orderBy(desc(painEntries.createdAt));
 
-    const formattedEntries = entries.map(entry => ({
-      ...entry,
-      treatmentForm: entry.treatmentForm?.formData 
-        ? { formData: JSON.parse(entry.treatmentForm.formData as string) }
-        : null,
-    }));
-
-    return NextResponse.json({ entries: formattedEntries });
+    return NextResponse.json({ entries });
   } catch (error) {
     console.error('Get pain entries error:', error);
     return NextResponse.json(

@@ -1,4 +1,4 @@
-# Diário de Dor - Physiotherapy Pain Tracker
+# Diário da Dor - Physiotherapy Pain Tracker
 
 Uma aplicação web para acompanhamento da dor em tratamentos fisioterápicos, desenvolvida com Next.js, TypeScript e SQLite.
 

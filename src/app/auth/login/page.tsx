@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Header from '@/components/Header';
 
 export default function Login() {
   const [phone, setPhone] = useState('');
@@ -42,16 +43,7 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-green-50 flex flex-col">
       {/* Header */}
-      <div className="safe-area-top bg-white border-b border-gray-100">
-        <div className="flex items-center px-4 py-3">
-          <Link href="/" className="btn-ghost p-2">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </Link>
-          <h1 className="text-heading ml-2">Entrar</h1>
-        </div>
-      </div>
+      <Header title="Login" isAuth  canGoBack/>
 
       {/* Content */}
       <div className="flex-1 px-4 py-8">

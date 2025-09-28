@@ -1,46 +1,64 @@
-import Link from 'next/link';
+import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-green-50 flex flex-col">
+    // 1. Correção: Adicionar 'overflow-x-hidden' para remover a barra de rolagem horizontal
+    <div className="min-h-screen bg-white flex flex-col overflow-x-hidden">
       {/* Hero Section */}
-      <div className="flex-1 flex flex-col justify-center px-4 py-8">
+      <div className="flex-1 flex flex-col justify-center items-center px-6 py-12 bg-green-50">
         <div className="max-w-sm mx-auto w-full">
-          {/* Logo/Icon */}
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
+          {/* 1. Ícone Minimalista e Marca */}
+          <div className="text-center mb-10">
+            {/* Ícone menor (w-20 h-20) e discreto (bg-green-100) */}
+            <div className="w-20 h-20 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4 shadow-md">
+              <Image
+                src="/favicon.png"
+                width={40}
+                height={40}
+                alt="Ícone do Diário da Dor"
+              />
             </div>
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">Diário de Dor</h1>
-            <p className="text-body">Acompanhe seu tratamento fisioterápico</p>
+
+            {/* Título e Subtítulo */}
+            <h1 className="text-3xl font-extrabold text-gray-900 mb-2 tracking-tight">
+              Diário da Dor
+            </h1>
+            <p className="text-lg text-green-700 font-medium">
+              Seu guia para uma recuperação assistida.
+            </p>
           </div>
-          
-          {/* Action Buttons */}
-          <div className="space-y-3">
-            <Link 
+
+          {/* Cartão de Destaque - Mantido para dar textura */}
+          <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100 mb-12">
+            <h3 className="text-sm font-semibold text-gray-700 mb-2">
+              Acompanhamento Profissional
+            </h3>
+            <p className="text-caption text-gray-500">
+              Registre a evolução da sua dor e ajude seu terapeuta a otimizar
+              seu plano de tratamento.
+            </p>
+          </div>
+
+          {/* 2. Action Buttons - Foco e Tamanho Aumentado */}
+          <div className="space-y-5">
+            <Link
               href="/auth/login"
-              className="btn-primary w-full block text-center"
+              // Aumentamos o padding (py-5) e o texto (text-xl)
+              className="btn-primary w-full block text-center py-5 text-xl font-bold shadow-xl transition-shadow"
             >
-              Entrar
+              Entrar na Minha Conta
             </Link>
-            
-            <Link 
+
+            <Link
               href="/auth/register"
-              className="btn-secondary w-full block text-center"
+              // Aumentamos o padding (py-5) e o texto (text-xl)
+              className="btn-secondary w-full block text-center py-5 text-xl font-bold"
             >
-              Primeiro Acesso
+              Criar Minha Conta
             </Link>
           </div>
         </div>
-      </div>
-
-      {/* Footer */}
-      <div className="px-4 py-6 safe-area-bottom">
-        <p className="text-caption text-center">
-          Versão 1.0 • Desenvolvido para acompanhamento médico
-        </p>
       </div>
     </div>
   );

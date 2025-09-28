@@ -4,6 +4,13 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import PainChart from '@/components/PainChart';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { X } from 'lucide-react';
 
 interface PainEntry {
   id: number;
@@ -80,6 +87,8 @@ export default function History() {
     });
   };
 
+  const closeDetailsModal = () => setSelectedEntry(null);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-green-50 flex items-center justify-center">
@@ -94,7 +103,7 @@ export default function History() {
   return (
     <div className="min-h-screen bg-green-50">
       <Header title="Histórico" />
-      
+
       <div className="px-4 py-6">
         {entries.length === 0 ? (
           <div className="text-center py-12">
@@ -114,12 +123,11 @@ export default function History() {
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Pain Evolution Charts */}
+            
             <div className="mb-6">
               <PainChart entries={entries} />
             </div>
 
-            {/* Pain Entries List */}
             <div>
               <h2 className="text-subheading mb-4">Registros Detalhados</h2>
               <div className="space-y-3">
@@ -159,93 +167,59 @@ export default function History() {
         )}
       </div>
 
-      {/* Modal for entry details */}
-      {selectedEntry && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50 md:items-center">
-          <div className="bg-white rounded-t-2xl md:rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto safe-area-bottom">
-            <div className="sticky top-0 bg-white border-b border-gray-100 px-4 py-3">
-              <div className="flex justify-between items-center">
-                <h2 className="text-subheading">Detalhes do Registro</h2>
-                <button
-                  onClick={() => setSelectedEntry(null)}
-                  className="btn-ghost p-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            </div>
+      <Dialog open={!!selectedEntry} onOpenChange={closeDetailsModal}>
+        <DialogContent className="sm:max-w-lg rounded-t-2xl sm:rounded-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-subheading">Detalhes do Registro</DialogTitle>
+          </DialogHeader>
 
-            <div className="p-4 space-y-4">
-              <div className="flex items-center gap-3">
-                <h3 className="text-body font-medium">
+          {selectedEntry && (
+            <div className="p-2 space-y-4">
+              <div className="flex items-center gap-3 border-b pb-3">
+                <h3 className="text-lg font-bold">
                   {bodyPartNames[selectedEntry.bodyPart] || selectedEntry.bodyPart}
                 </h3>
                 <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${getPainColor(
+                  className={`px-3 py-1 rounded-full text-sm font-semibold ${getPainColor(
                     selectedEntry.painLevel
                   )}`}
                 >
                   Nível {selectedEntry.painLevel}
                 </span>
+                <p className="text-sm text-gray-500 ml-auto">
+                  {formatDate(selectedEntry.createdAt)}
+                </p>
               </div>
 
-              <p className="text-caption">
-                <strong>Data:</strong> {formatDate(selectedEntry.createdAt)}
-              </p>
-
               {selectedEntry.treatmentForm && (
-                <div className="space-y-3 mt-4">
-                  <h4 className="text-body font-medium">Informações Adicionais</h4>
+                <div className="space-y-4 mt-4">
+                  <h4 className="text-body font-semibold text-gray-700">Informações Adicionais</h4>
                   
-                  {selectedEntry.treatmentForm.formData.symptoms && (
-                    <div>
-                      <strong className="text-caption">Sintomas:</strong>
-                      <p className="text-body mt-1">{selectedEntry.treatmentForm.formData.symptoms}</p>
-                    </div>
-                  )}
+                  {Object.entries(selectedEntry.treatmentForm.formData).map(([key, value]) => {
+                    if (!value) return null;
 
-                  {selectedEntry.treatmentForm.formData.duration && (
-                    <div>
-                      <strong className="text-caption">Duração:</strong>
-                      <p className="text-body mt-1">{selectedEntry.treatmentForm.formData.duration}</p>
-                    </div>
-                  )}
+                    const fieldNameMap: { [key: string]: string } = {
+                        symptoms: 'Sintomas',
+                        duration: 'Duração da dor',
+                        triggers: 'Possíveis causas',
+                        previousTreatments: 'Tratamentos realizados',
+                        medications: 'Medicamentos',
+                        notes: 'Observações',
+                    };
 
-                  {selectedEntry.treatmentForm.formData.triggers && (
-                    <div>
-                      <strong className="text-caption">Possíveis causas:</strong>
-                      <p className="text-body mt-1">{selectedEntry.treatmentForm.formData.triggers}</p>
-                    </div>
-                  )}
-
-                  {selectedEntry.treatmentForm.formData.previousTreatments && (
-                    <div>
-                      <strong className="text-caption">Tratamentos realizados:</strong>
-                      <p className="text-body mt-1">{selectedEntry.treatmentForm.formData.previousTreatments}</p>
-                    </div>
-                  )}
-
-                  {selectedEntry.treatmentForm.formData.medications && (
-                    <div>
-                      <strong className="text-caption">Medicamentos:</strong>
-                      <p className="text-body mt-1">{selectedEntry.treatmentForm.formData.medications}</p>
-                    </div>
-                  )}
-
-                  {selectedEntry.treatmentForm.formData.notes && (
-                    <div>
-                      <strong className="text-caption">Observações:</strong>
-                      <p className="text-body mt-1">{selectedEntry.treatmentForm.formData.notes}</p>
-                    </div>
-                  )}
+                    return (
+                      <div key={key}>
+                        <strong className="text-caption block text-gray-600">{fieldNameMap[key] || key}:</strong>
+                        <p className="text-body mt-1 bg-gray-50 p-2 rounded">{value}</p>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
-          </div>
-        </div>
-      )}
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

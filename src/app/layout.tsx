@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Diário de Dor",
+  title: "Diário da Dor",
   description: "Aplicação para acompanhamento da dor em tratamentos fisioterápicos",
   icons: {
     icon: "/favicon.png",

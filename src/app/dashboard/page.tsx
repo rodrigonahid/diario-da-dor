@@ -94,6 +94,7 @@ export default function Dashboard() {
       alert('Erro de conexão');
     } finally {
       setLoading(false);
+      router.push("/history")
     }
   };
 
