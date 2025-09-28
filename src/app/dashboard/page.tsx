@@ -107,12 +107,12 @@ export default function Dashboard() {
   if (!user) {
     return (
       <div className="min-h-screen bg-green-50 flex items-center justify-center">
-        <div className="text-center">
-          <Spinner size={24} />
-          <p className="text-body">Carregando...</p>
+        <div className="flex flex-col items-center"> {/* Use flex-col e items-center */}
+          <Spinner size={32} className="text-green-600 mb-4" /> {/* Adiciona margem inferior */}
+          <p className="text-body text-gray-700">Carregando...</p>
         </div>
       </div>
-    );
+    );    
   }
 
   return (
