@@ -1,25 +1,25 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { pgTable, text, serial, integer, timestamp, json } from 'drizzle-orm/pg-core';
 
-export const users = sqliteTable('users', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
   name: text('name').notNull(),
   phone: text('phone').notNull().unique(),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
 });
 
-export const painEntries = sqliteTable('pain_entries', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  userId: integer('user_id').notNull().references(() => users.id),
+export const painEntries = pgTable('pain_entries', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   bodyPart: text('body_part').notNull(),
   painLevel: integer('pain_level').notNull(),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
 });
 
-export const treatmentForms = sqliteTable('treatment_forms', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  painEntryId: integer('pain_entry_id').notNull().references(() => painEntries.id),
-  formData: text('form_data', { mode: 'json' }).notNull(),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().$defaultFn(() => new Date()),
+export const treatmentForms = pgTable('treatment_forms', {
+  id: serial('id').primaryKey(),
+  painEntryId: integer('pain_entry_id').notNull().references(() => painEntries.id, { onDelete: 'cascade' }),
+  formData: json('form_data').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull().defaultNow(),
 });
 
 export type User = typeof users.$inferSelect;
