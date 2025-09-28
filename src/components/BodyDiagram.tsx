@@ -108,7 +108,7 @@ export default function BodyDiagram({ onBodyPartSelect, selectedBodyPart }: Body
             className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               selectedBodyPart === part.id
                 ? 'bg-red-500 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-background text-gray-700 hover:bg-gray-200'
             }`}
           >
             {part.name}

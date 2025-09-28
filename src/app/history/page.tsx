@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { X } from 'lucide-react';
+import { Spinner } from '@/components/Spinner';
 
 interface PainEntry {
   id: number;
@@ -92,12 +92,12 @@ export default function History() {
   if (loading) {
     return (
       <div className="min-h-screen bg-green-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-body">Carregando histórico...</p>
+        <div className="flex flex-col items-center"> {/* Use flex-col e items-center */}
+          <Spinner size={32} className="text-green-600 mb-4" /> {/* Adiciona margem inferior */}
+          <p className="text-body text-gray-700">Carregando histórico...</p>
         </div>
       </div>
-    );
+    );    
   }
 
   return (

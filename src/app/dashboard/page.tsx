@@ -1,12 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Header from '@/components/Header';
-import BodyDiagram from '@/components/BodyDiagram';
-import PainLevelSlider from '@/components/PainLevelSlider';
-import TreatmentForm from '@/components/TreatmentForm';
-
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Header from "@/components/Header";
+import BodyDiagram from "@/components/BodyDiagram";
+import PainLevelSlider from "@/components/PainLevelSlider";
+import TreatmentForm from "@/components/TreatmentForm";
+import { toast } from "sonner";
+import { Spinner } from "@/components/Spinner";
 interface User {
   id: number;
   name: string;
@@ -16,15 +17,15 @@ interface User {
 export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
-  const [selectedBodyPart, setSelectedBodyPart] = useState('');
+  const [selectedBodyPart, setSelectedBodyPart] = useState("");
   const [painLevel, setPainLevel] = useState(0);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const userId = localStorage.getItem('userId');
+    const userId = localStorage.getItem("userId");
     if (!userId) {
-      router.push('/');
+      router.push("/");
       return;
     }
 
@@ -35,11 +36,11 @@ export default function Dashboard() {
           const userData = await response.json();
           setUser(userData.user);
         } else {
-          router.push('/');
+          router.push("/");
         }
       } catch (error) {
-        console.error('Error fetching user:', error);
-        router.push('/');
+        console.error("Error fetching user:", error);
+        router.push("/");
       }
     };
 
@@ -66,12 +67,12 @@ export default function Dashboard() {
     notes: string;
   }) => {
     setLoading(true);
-    
+
     try {
-      const response = await fetch('/api/pain-entry', {
-        method: 'POST',
+      const response = await fetch("/api/pain-entry", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           userId: user?.id,
@@ -82,19 +83,24 @@ export default function Dashboard() {
       });
 
       if (response.ok) {
-        alert('Registro salvo com sucesso!');
+        // 🚨 Substituindo alert por Toast de sucesso
+        toast("Sucesso! 🎉", {
+          description: "O registro de dor foi salvo com sucesso.",
+        });
+
         setCurrentStep(1);
-        setSelectedBodyPart('');
+        setSelectedBodyPart("");
         setPainLevel(0);
+        router.push("/history");
       } else {
-        alert('Erro ao salvar registro');
+        toast("Não foi possível completar o registro. Tente novamente.");
       }
     } catch (error) {
-      console.error('Error saving pain entry:', error);
-      alert('Erro de conexão');
+      console.error("Error saving pain entry:", error);
+      // 🚨 Substituindo alert por Toast de erro de conexão
+      toast("Verifique sua conexão e tente salvar novamente.");
     } finally {
       setLoading(false);
-      router.push("/history")
     }
   };
 
@@ -102,7 +108,7 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen bg-green-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <Spinner size={24} />
           <p className="text-body">Carregando...</p>
         </div>
       </div>
@@ -112,11 +118,13 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-green-50">
       <Header title="Novo Registro" />
-      
+
       <div className="px-4 py-6">
         <div className="mb-6">
           <p className="text-body">Olá, {user.name}</p>
-          <p className="text-caption">Registre sua dor para acompanhar o tratamento</p>
+          <p className="text-caption">
+            Registre sua dor para acompanhar o tratamento
+          </p>
         </div>
 
         {/* Progress Steps */}
@@ -128,8 +136,8 @@ export default function Dashboard() {
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
                       currentStep >= step
-                        ? 'bg-green-500 text-white'
-                        : 'bg-gray-200 text-gray-600'
+                        ? "bg-green-500 text-white"
+                        : "bg-background text-gray-600"
                     }`}
                   >
                     {step}
@@ -137,7 +145,7 @@ export default function Dashboard() {
                   {step < 3 && (
                     <div
                       className={`w-12 h-1 mx-2 ${
-                        currentStep > step ? 'bg-green-500' : 'bg-gray-200'
+                        currentStep > step ? "bg-green-500" : "bg-background"
                       }`}
                     />
                   )}
@@ -148,9 +156,9 @@ export default function Dashboard() {
 
           <div className="text-center mb-6">
             <h2 className="text-subheading">
-              {currentStep === 1 && 'Localização da Dor'}
-              {currentStep === 2 && 'Intensidade da Dor'}
-              {currentStep === 3 && 'Informações Adicionais'}
+              {currentStep === 1 && "Localização da Dor"}
+              {currentStep === 2 && "Intensidade da Dor"}
+              {currentStep === 3 && "Informações Adicionais"}
             </h2>
           </div>
         </div>
@@ -186,7 +194,10 @@ export default function Dashboard() {
 
         {currentStep === 3 && (
           <div className="space-y-6">
-            <TreatmentForm onSubmit={handleTreatmentFormSubmit} loading={loading} />
+            <TreatmentForm
+              onSubmit={handleTreatmentFormSubmit}
+              loading={loading}
+            />
             <div className="flex justify-center">
               <button
                 onClick={() => setCurrentStep(2)}
