@@ -12,26 +12,52 @@ import {
 } from '@/components/ui/dialog';
 import { Spinner } from '@/components/Spinner';
 
+// 🚨 1. ATUALIZANDO A INTERFACE para incluir os campos de monitoramento
+interface TreatmentFormData {
+  // Campos originais (Se ainda existirem no Passo 3)
+  symptoms?: string;
+  duration?: string;
+  triggers?: string;
+  previousTreatments?: string;
+  medications?: string;
+  notes?: string;
+  
+  // Campos de Monitoramento (Assumindo que estão aqui ou foram mesclados)
+  painComparison?: string; // Ex: 'melhorou', 'igual', 'piorou'
+  painRelief?: string;     // O que aliviou a dor hoje
+  painPattern?: string;    
+  painType?: string;       
+  painWorse?: string;      
+  interference?: string;   
+  sleepQuality?: string;   
+  exercisesDone?: string;  
+  exercisesEffect?: string;
+}
+
 interface PainEntry {
   id: number;
   bodyPart: string;
   painLevel: number;
   createdAt: string;
   treatmentForm?: {
-    formData: {
-      symptoms: string;
-      duration: string;
-      triggers: string;
-      previousTreatments: string;
-      medications: string;
-      notes: string;
-    };
+    formData: TreatmentFormData;
   };
 }
 
+// Mapeamento de Labels de Opções (para exibição amigável)
+const painReliefLabels: { [key: string]: string } = {
+  'repouso': 'Repouso',
+  'movimento': 'Movimento Suave',
+  'medicacao': 'Medicação',
+  'gelo-calor': 'Gelo/Calor',
+  'fisioterapia': 'Sessão de Fisioterapia',
+  'nada': 'Nada Aliviou', 
+  'outro': 'Outra Ação',
+};
+
 const bodyPartNames: { [key: string]: string } = {
   cabeca: 'Cabeça',
-  pescoco: 'Pescoço',
+  pescoço: 'Pescoço',
   ombro: 'Ombro',
   costas: 'Costas',
   quadril: 'Quadril',
@@ -71,6 +97,38 @@ export default function History() {
     fetchEntries();
   }, [router]);
 
+  // 🚨 2. LÓGICA PARA FILTRAR E AGRUPAR ESTRATÉGIAS DE SUCESSO (COM EXCLUSÃO)
+  const successfulStrategies = entries
+    .filter(entry => 
+        // Filtra os registros onde o paciente disse que a dor MELHOROU
+        entry.treatmentForm?.formData?.painComparison === 'melhorou' && 
+        entry.treatmentForm?.formData?.painRelief && // Garante que a ação de alívio foi registrada
+        entry.treatmentForm?.formData?.painRelief !== 'nada' // 🚨 NOVO FILTRO: EXCLUI "NADA ALIVIOU"
+    )
+    .reduce((acc, entry) => {
+        const reliefKey = entry.treatmentForm?.formData?.painRelief as keyof typeof painReliefLabels;
+        const reliefAction = painReliefLabels[reliefKey] || reliefKey; // Usa a label amigável
+        
+        // Agrupa pelo tipo de alívio e adiciona a contagem
+        if (acc[reliefAction]) {
+            acc[reliefAction].count += 1;
+            acc[reliefAction].lastUsed = new Date(entry.createdAt);
+        } else {
+            acc[reliefAction] = {
+                count: 1,
+                lastUsed: new Date(entry.createdAt),
+                bodyParts: [],
+            };
+        }
+        return acc;
+    }, {} as { [key: string]: { count: number, lastUsed: Date, bodyParts: string[] } });
+    
+  // Converte para um array e ordena por frequência (mais usado primeiro)
+  const sortedStrategies = Object.entries(successfulStrategies)
+    .sort(([, a], [, b]) => b.count - a.count)
+    .map(([action, data]) => ({ action, ...data }));
+
+
   const getPainColor = (level: number) => {
     if (level <= 3) return 'text-green-600 bg-green-100';
     if (level <= 6) return 'text-yellow-600 bg-yellow-100';
@@ -92,8 +150,8 @@ export default function History() {
   if (loading) {
     return (
       <div className="min-h-screen bg-green-50 flex items-center justify-center">
-        <div className="flex flex-col items-center"> {/* Use flex-col e items-center */}
-          <Spinner size={32} className="text-green-600 mb-4" /> {/* Adiciona margem inferior */}
+        <div className="flex flex-col items-center">
+          <Spinner size={32} className="text-green-600 mb-4" />
           <p className="text-body text-gray-700">Carregando histórico...</p>
         </div>
       </div>
@@ -122,12 +180,50 @@ export default function History() {
             </button>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-8">
             
+            {/* 3. NOVA SEÇÃO DE ESTRATÉGIAS DE SUCESSO */}
+            <div className="card p-6 bg-yellow-50 border border-yellow-200 shadow-lg">
+                <h2 className="text-xl font-bold text-yellow-800 mb-4 flex items-center gap-2">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-8a1 1 0 000 2h2a1 1 0 000-2h-2zm-1-7h4v4h-4V7z"/></svg>
+                    Estratégias que Funcionaram! 🚀
+                </h2>
+                
+                {sortedStrategies.length === 0 ? (
+                    <p className="text-caption text-yellow-700">
+                        Nenhum registro de dor melhorada com ação específica encontrado. Continue acompanhando!
+                    </p>
+                ) : (
+                    <div className="space-y-4">
+                        {sortedStrategies.map(({ action, count, lastUsed }) => (
+                            <div 
+                                key={action} 
+                                className="flex items-center justify-between p-3 rounded-lg bg-white border border-yellow-300 shadow-md transition-shadow hover:shadow-lg"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 flex items-center justify-center bg-green-200 text-green-800 rounded-full font-bold text-sm">
+                                        {count}x
+                                    </span>
+                                    <div>
+                                        <p className="font-semibold text-body text-gray-800">{action}</p>
+                                        <p className="text-caption text-gray-500">Último uso: {lastUsed.toLocaleDateString('pt-BR')}</p>
+                                    </div>
+                                </div>
+                                <span className="text-green-600 font-bold text-sm">
+                                    Sucesso!
+                                </span>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* Gráfico de Evolução (Mantido) */}
             <div className="mb-6">
               <PainChart entries={entries} />
             </div>
 
+            {/* Registros Detalhados (Mantido) */}
             <div>
               <h2 className="text-subheading mb-4">Registros Detalhados</h2>
               <div className="space-y-3">
@@ -137,6 +233,7 @@ export default function History() {
                     className="card hover:shadow-md transition-shadow cursor-pointer"
                     onClick={() => setSelectedEntry(entry)}
                   >
+                    {/* Conteúdo do registro na lista */}
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
@@ -167,6 +264,7 @@ export default function History() {
         )}
       </div>
 
+      {/* Modal de Detalhes (Mantido) */}
       <Dialog open={!!selectedEntry} onOpenChange={closeDetailsModal}>
         <DialogContent className="sm:max-w-lg rounded-t-2xl sm:rounded-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -195,22 +293,38 @@ export default function History() {
                 <div className="space-y-4 mt-4">
                   <h4 className="text-body font-semibold text-gray-700">Informações Adicionais</h4>
                   
+                  {/* Mapeamento de todos os campos para exibição no modal */}
                   {Object.entries(selectedEntry.treatmentForm.formData).map(([key, value]) => {
                     if (!value) return null;
 
                     const fieldNameMap: { [key: string]: string } = {
+                        // Campos Originais
                         symptoms: 'Sintomas',
                         duration: 'Duração da dor',
                         triggers: 'Possíveis causas',
                         previousTreatments: 'Tratamentos realizados',
                         medications: 'Medicamentos',
                         notes: 'Observações',
+                        // Novos Campos de Monitoramento
+                        painComparison: 'Comparação com ontem',
+                        painPattern: 'Padrão da dor',
+                        painType: 'Tipo da dor',
+                        painRelief: 'Ação de alívio',
+                        painWorse: 'Fator de piora',
+                        interference: 'Interferência nas atividades',
+                        sleepQuality: 'Qualidade do sono',
+                        exercisesDone: 'Exercícios realizados',
+                        exercisesEffect: 'Efeito dos exercícios',
                     };
+
+                    // Usa o label amigável, ou a chave se não houver mapeamento
+                    const displayValue = painReliefLabels[value as keyof typeof painReliefLabels] || value; 
+                    const displayKey = fieldNameMap[key] || key;
 
                     return (
                       <div key={key}>
-                        <strong className="text-caption block text-gray-600">{fieldNameMap[key] || key}:</strong>
-                        <p className="text-body mt-1 bg-gray-50 p-2 rounded">{value}</p>
+                        <strong className="text-caption block text-gray-600">{displayKey}:</strong>
+                        <p className="text-body mt-1 bg-gray-50 p-2 rounded">{displayValue}</p>
                       </div>
                     );
                   })}
