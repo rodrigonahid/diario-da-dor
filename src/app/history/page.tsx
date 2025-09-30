@@ -115,7 +115,7 @@ export default function History() {
             <p className="text-body mb-4">Nenhum registro encontrado</p>
             <p className="text-caption mb-6">Comece registrando sua primeira dor</p>
             <button
-              onClick={() => router.push('/dashboard')}
+              onClick={() => router.push('/formulario')}
               className="btn-primary"
             >
               Criar Primeiro Registro

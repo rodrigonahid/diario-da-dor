@@ -29,9 +29,6 @@ export default function Register() {
       const data = await response.json();
 
       if (response.ok) {
-        // ⚠️ Atenção: Se a rota de login já define o userId,
-        // considere redirecionar para a tela de login aqui
-        // ou garantir que o backend envie a sessão completa.
         localStorage.setItem("userId", data.user.id);
         router.push("/dashboard");
       } else {
@@ -45,7 +42,7 @@ export default function Register() {
   };
 
   return (
-    // 1. Fundo e Layout Principal (Similar ao Login)
+    
     <div className="min-h-screen bg-green-50 flex flex-col">
       {/* Header (Mantenha o mesmo setup) */}
       <Header title="Criar Conta" canGoBack isAuth={false} />
@@ -71,7 +68,7 @@ export default function Register() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Seu nome completo"
-                // 2. CLASSE DE INPUT IDÊNTICA AO LOGIN
+                
                 className="input-field" 
                 required
               />
@@ -88,7 +85,7 @@ export default function Register() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="(11) 99999-9999"
-                // 2. CLASSE DE INPUT IDÊNTICA AO LOGIN
+                
                 className="input-field"
                 required
               />

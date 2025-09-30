@@ -8,44 +8,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'; 
-import { Textarea } from '@/components/ui/textarea'; 
 
-// 🚨 1. INTERFACE DE DADOS ATUALIZADA
 interface TreatmentFormData {
-  // Campos originais
-  symptoms: string;
-  duration: string;
-  triggers: string;
-  previousTreatments: string;
-  medications: string;
-  notes: string;
-  
-  // Novos campos de monitoramento
-  painComparison: string; // Como você classificaria sua dor hoje
-  painPattern: string;    // A dor é constante ou varia
-  painType: string;       // Tipo da dor
-  painRelief: string;     // O que aliviou a dor hoje
-  painWorse: string;      // O que piorou a dor hoje
-  interference: string;   // A dor interferiu nas atividades
-  sleepQuality: string;   // Como foi seu sono
-  exercisesDone: string;  // Realizou os exercícios
-  exercisesEffect: string;// Após os exercícios, como se sentiu
+  painComparison: string; 
+  painPattern: string;    
+  painType: string;       
+  painRelief: string;     
+  painWorse: string;      
+  interference: string;   
+  sleepQuality: string;   
+  exercisesDone: string;  
+  exercisesEffect: string;
 }
 
 interface TreatmentFormProps {
   onSubmit: (data: TreatmentFormData) => void;
   loading?: boolean;
 }
-
-// 🚨 2. NOVAS LISTAS DE OPÇÕES PARA OS SELECTS
-const durationOptions = [
-  { value: 'menos-1-dia', label: 'Menos de 1 dia' },
-  { value: '1-3-dias', label: '1 a 3 dias' },
-  { value: '1-semana', label: 'Cerca de 1 semana' },
-  { value: '2-4-semanas', label: '2 a 4 semanas' },
-  { value: '1-3-meses', label: '1 a 3 meses' },
-  { value: 'mais-3-meses', label: 'Mais de 3 meses' },
-];
 
 const painComparisonOptions = [
   { value: 'melhorou', label: 'Melhorou' },
@@ -115,7 +94,6 @@ const exercisesEffectOptions = [
   { value: 'nao-fiz', label: 'Não fiz' },
 ];
 
-// Helper component to render a Select field
 interface SelectFieldProps {
     id: keyof TreatmentFormData;
     label: string;
@@ -153,14 +131,6 @@ const SelectField = ({ id, label, options, value, onChange, required }: SelectFi
 
 export default function TreatmentForm({ onSubmit, loading = false }: TreatmentFormProps) {
   const [formData, setFormData] = useState<TreatmentFormData>({
-    symptoms: '',
-    duration: '',
-    triggers: '',
-    previousTreatments: '',
-    medications: '',
-    notes: '',
-    
-    // 🚨 3. ESTADO INICIAL DOS NOVOS CAMPOS
     painComparison: '',
     painPattern: '',
     painType: '',
@@ -180,8 +150,7 @@ export default function TreatmentForm({ onSubmit, loading = false }: TreatmentFo
     e.preventDefault();
     onSubmit(formData);
   };
-  
-  // Centraliza o manipulador de mudanças para usar a função genérica handleChange
+
   const handleSelectChange = (field: keyof TreatmentFormData) => (value: string) => {
     handleChange(field, value);
   };
@@ -193,11 +162,6 @@ export default function TreatmentForm({ onSubmit, loading = false }: TreatmentFo
       </h3>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        
-        {/* ---------------------------------------------------------------------- */}
-        {/* 🚨 NOVOS CAMPOS DE MONITORAMENTO (SELECTS) */}
-        {/* ---------------------------------------------------------------------- */}
-        
         <SelectField
           id="painComparison"
           label="Como você classificaria sua dor hoje em relação a ontem?"
@@ -279,88 +243,7 @@ export default function TreatmentForm({ onSubmit, loading = false }: TreatmentFo
           required
         />
 
-
-        {/* ---------------------------------------------------------------------- */}
-        {/* CAMPOS ORIGINAIS (TEXTAREA E DURATION SELECT) */}
-        {/* ---------------------------------------------------------------------- */}
         
-        <div className="pt-4 border-t border-gray-200">
-            <h4 className="text-lg font-semibold text-gray-800 mb-4">Detalhes Adicionais</h4>
-        </div>
-        
-        <SelectField 
-            id="duration"
-            label="Há quanto tempo sente essa dor?"
-            options={durationOptions}
-            value={formData.duration}
-            onChange={handleSelectChange('duration')}
-            required
-        />
-        
-        <div>
-          <label htmlFor="symptoms" className="block text-sm font-medium text-gray-700 mb-2">
-            Descreva os sintomas
-          </label>
-          <Textarea
-            id="symptoms"
-            value={formData.symptoms}
-            onChange={(e) => handleChange('symptoms', e.target.value)}
-            placeholder="Ex: formigamento, latejante, queimação, ou outros detalhes da dor."
-            rows={3}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="triggers" className="block text-sm font-medium text-gray-700 mb-2">
-            O que pode ter causado ou piorado a dor?
-          </label>
-          <Textarea
-            id="triggers"
-            value={formData.triggers}
-            onChange={(e) => handleChange('triggers', e.target.value)}
-            placeholder="Movimento específico, atividade, postura, estresse, etc."
-            rows={2}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="previousTreatments" className="block text-sm font-medium text-gray-700 mb-2">
-            Tratamentos já realizados
-          </label>
-          <Textarea
-            id="previousTreatments"
-            value={formData.previousTreatments}
-            onChange={(e) => handleChange('previousTreatments', e.target.value)}
-            placeholder="Fisioterapia, massagem, compressas, repouso, etc."
-            rows={2}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="medications" className="block text-sm font-medium text-gray-700 mb-2">
-            Medicamentos utilizados
-          </label>
-          <Textarea
-            id="medications"
-            value={formData.medications}
-            onChange={(e) => handleChange('medications', e.target.value)}
-            placeholder="Anti-inflamatórios, analgésicos, relaxantes musculares, etc."
-            rows={2}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
-            Observações adicionais
-          </label>
-          <Textarea
-            id="notes"
-            value={formData.notes}
-            onChange={(e) => handleChange('notes', e.target.value)}
-            placeholder="Qualquer informação adicional que considere importante"
-            rows={3}
-          />
-        </div>
 
         <button
           type="submit"

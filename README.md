@@ -75,7 +75,7 @@ src/
 ├── app/                    # Next.js App Router
 │   ├── api/               # API Routes
 │   ├── auth/              # Páginas de autenticação
-│   ├── dashboard/         # Dashboard principal
+│   ├── formulario/         # formulario principal
 │   └── history/           # Histórico de registros
 ├── components/            # Componentes React
 │   ├── BodyDiagram.tsx    # Diagrama interativo do corpo

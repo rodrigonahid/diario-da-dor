@@ -3,11 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
-import BodyDiagram from "@/components/BodyDiagram";
-import PainLevelSlider from "@/components/PainLevelSlider";
-import TreatmentForm from "@/components/TreatmentForm";
-import { toast } from "sonner";
 import { Spinner } from "@/components/Spinner";
+
 interface User {
   id: number;
   name: string;
@@ -16,10 +13,7 @@ interface User {
 
 export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null);
-  const [currentStep, setCurrentStep] = useState(1);
-  const [selectedBodyPart, setSelectedBodyPart] = useState("");
-  const [painLevel, setPainLevel] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loadingUser, setLoadingUser] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -41,173 +35,70 @@ export default function Dashboard() {
       } catch (error) {
         console.error("Error fetching user:", error);
         router.push("/");
+      } finally {
+        setLoadingUser(false);
       }
     };
 
     fetchUser();
   }, [router]);
 
-  const handleBodyPartSelect = (bodyPart: string) => {
-    setSelectedBodyPart(bodyPart);
-    setCurrentStep(2);
-  };
-
-  const handlePainLevelNext = () => {
-    if (painLevel > 0) {
-      setCurrentStep(3);
-    }
-  };
-
-  const handleTreatmentFormSubmit = async (formData: {
-    symptoms: string;
-    duration: string;
-    triggers: string;
-    previousTreatments: string;
-    medications: string;
-    notes: string;
-  }) => {
-    setLoading(true);
-
-    try {
-      const response = await fetch("/api/pain-entry", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: user?.id,
-          bodyPart: selectedBodyPart,
-          painLevel,
-          formData,
-        }),
-      });
-
-      if (response.ok) {
-        // 🚨 Substituindo alert por Toast de sucesso
-        toast("Sucesso! 🎉", {
-          description: "O registro de dor foi salvo com sucesso.",
-        });
-
-        setCurrentStep(1);
-        setSelectedBodyPart("");
-        setPainLevel(0);
-        router.push("/history");
-      } else {
-        toast("Não foi possível completar o registro. Tente novamente.");
-      }
-    } catch (error) {
-      console.error("Error saving pain entry:", error);
-      // 🚨 Substituindo alert por Toast de erro de conexão
-      toast("Verifique sua conexão e tente salvar novamente.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!user) {
+  if (loadingUser || !user) {
     return (
       <div className="min-h-screen bg-green-50 flex items-center justify-center">
-        <div className="flex flex-col items-center"> {/* Use flex-col e items-center */}
-          <Spinner size={32} className="text-green-600 mb-4" /> {/* Adiciona margem inferior */}
-          <p className="text-body text-gray-700">Carregando...</p>
+        <div className="flex flex-col items-center">
+          <Spinner size={32} className="text-green-600 mb-4" />
+          <p className="text-body text-gray-700">Carregando informações...</p>
         </div>
       </div>
-    );    
+    );
   }
 
   return (
     <div className="min-h-screen bg-green-50">
-      <Header title="Novo Registro" />
+      <Header title="Menu Principal" />
 
-      <div className="px-4 py-6">
-        <div className="mb-6">
-          <p className="text-body">Olá, {user.name}</p>
-          <p className="text-caption">
-            Registre sua dor para acompanhar o tratamento
-          </p>
-        </div>
+      <div className="px-6 py-10 flex flex-col items-center text-center">
+        <h1 className="text-2xl font-bold text-gray-800 mb-3">
+          Bem-vindo(a), {user.name}!
+        </h1>
 
-        {/* Progress Steps */}
-        <div className="mb-8">
-          <div className="flex justify-center mb-6">
-            <div className="flex items-center">
-              {[1, 2, 3].map((step) => (
-                <div key={step} className="flex items-center">
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
-                      currentStep >= step
-                        ? "bg-green-500 text-white"
-                        : "bg-background text-gray-600"
-                    }`}
-                  >
-                    {step}
-                  </div>
-                  {step < 3 && (
-                    <div
-                      className={`w-12 h-1 mx-2 ${
-                        currentStep > step ? "bg-green-500" : "bg-background"
-                      }`}
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
+        <p className="text-subheading text-gray-600 mb-8 max-w-md">
+          Como você está se sentindo hoje? Vamos registrar seus dados para um
+          acompanhamento mais eficaz.
+        </p>
 
-          <div className="text-center mb-6">
-            <h2 className="text-subheading">
-              {currentStep === 1 && "Localização da Dor"}
-              {currentStep === 2 && "Intensidade da Dor"}
-              {currentStep === 3 && "Informações Adicionais"}
-            </h2>
-          </div>
-        </div>
-
-        {/* Step Content */}
-        {currentStep === 1 && (
-          <BodyDiagram
-            onBodyPartSelect={handleBodyPartSelect}
-            selectedBodyPart={selectedBodyPart}
-          />
-        )}
-
-        {currentStep === 2 && (
-          <div className="space-y-6">
-            <PainLevelSlider value={painLevel} onChange={setPainLevel} />
-            <div className="flex justify-center gap-3">
-              <button
-                onClick={() => setCurrentStep(1)}
-                className="btn-secondary"
-              >
-                Voltar
-              </button>
-              <button
-                onClick={handlePainLevelNext}
-                disabled={painLevel === 0}
-                className="btn-primary disabled:opacity-50"
-              >
-                Continuar
-              </button>
-            </div>
-          </div>
-        )}
-
-        {currentStep === 3 && (
-          <div className="space-y-6">
-            <TreatmentForm
-              onSubmit={handleTreatmentFormSubmit}
-              loading={loading}
+        <div className="mb-10 w-24 h-24 bg-green-100 rounded-full flex items-center justify-center">
+          <svg
+            className="w-10 h-10 text-green-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
             />
-            <div className="flex justify-center">
-              <button
-                onClick={() => setCurrentStep(2)}
-                className="btn-secondary"
-              >
-                Voltar
-              </button>
-            </div>
-          </div>
-        )}
+          </svg>
+        </div>
+
+        <div className="w-full max-w-sm space-y-4">
+          <button
+            onClick={() => router.push("/formulario")}
+            className="w-full py-3 px-6 rounded-lg text-lg font-semibold transition-colors bg-green-600 hover:bg-green-700 text-white shadow-lg"
+          >
+            Registrar Nova Dor
+          </button>
+
+          <button
+            onClick={() => router.push("/history")}
+            className="w-full py-3 px-6 rounded-lg text-lg font-semibold transition-colors bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 shadow-md"
+          >
+            Ver Histórico
+          </button>
+        </div>
       </div>
     </div>
   );

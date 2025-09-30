@@ -12,7 +12,7 @@ import {
   DrawerTitle,
   DrawerClose,
 } from "@/components/ui/drawer";
-import { Menu, X, ArrowLeft, LogOut, Plus, History } from "lucide-react";
+import { Menu, X, ArrowLeft, LogOut, Plus, History, Home } from "lucide-react";
 
 interface HeaderProps {
   title: string;
@@ -96,6 +96,17 @@ export default function Header({
                         <Link
                           href="/dashboard"
                           onClick={() => handleLinkClick("/dashboard")}
+                          className="flex items-center space-x-3 p-3 rounded-lg hover:bg-green-50 transition-colors"
+                        >
+                          <Home className="w-5 h-5 text-green-600" />
+                          <span className="text-body">Dashboard</span>
+                        </Link>
+                      </li>
+
+                      <li>
+                        <Link
+                          href="/formulario"
+                          onClick={() => handleLinkClick("/formulario")}
                           className="flex items-center space-x-3 p-3 rounded-lg hover:bg-green-50 transition-colors"
                         >
                           <Plus className="w-5 h-5 text-green-600" />
