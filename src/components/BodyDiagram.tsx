@@ -61,7 +61,7 @@ export default function BodyDiagram({ onBodyPartSelect, selectedBodyPart }: Body
             // Estilização dos botões para refletir a seleção
             className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors border ${
               selectedBodyPart === part.id
-                ? 'bg-red-500 text-white border-red-600 shadow-md'
+                ? 'bg-green-500 text-white border-green-600 shadow-md'
                 : 'bg-white text-gray-700 hover:bg-gray-100 border-gray-300'
             }`}
           >

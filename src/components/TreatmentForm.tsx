@@ -107,6 +107,8 @@ const SelectField = ({ id, label, options, value, onChange, required }: SelectFi
   <div>
     <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-2">
       {label}
+      {/* 🚨 Cor do asterisco alterada para verde */}
+      {required && <span className="text-green-500 ml-1">*</span>}
     </label>
     <Select 
       onValueChange={onChange} 
@@ -154,6 +156,11 @@ export default function TreatmentForm({ onSubmit, loading = false }: TreatmentFo
   const handleSelectChange = (field: keyof TreatmentFormData) => (value: string) => {
     handleChange(field, value);
   };
+  
+  // Verifica se TODOS os campos estão preenchidos para habilitar o botão
+  console.log('formData :>> ', formData);
+  const isFormIncomplete = Object.values(formData).some(val => !val);
+  const isDisabled = loading || isFormIncomplete;
 
   return (
     <div className="w-full max-w-2xl mx-auto">
@@ -168,7 +175,7 @@ export default function TreatmentForm({ onSubmit, loading = false }: TreatmentFo
           options={painComparisonOptions}
           value={formData.painComparison}
           onChange={handleSelectChange('painComparison')}
-          required
+          required={true}
         />
 
         <SelectField
@@ -177,7 +184,7 @@ export default function TreatmentForm({ onSubmit, loading = false }: TreatmentFo
           options={painPatternOptions}
           value={formData.painPattern}
           onChange={handleSelectChange('painPattern')}
-          required
+          required={true}
         />
 
         <SelectField
@@ -186,7 +193,7 @@ export default function TreatmentForm({ onSubmit, loading = false }: TreatmentFo
           options={painTypeOptions}
           value={formData.painType}
           onChange={handleSelectChange('painType')}
-          required
+          required={true}
         />
 
         <SelectField
@@ -195,7 +202,7 @@ export default function TreatmentForm({ onSubmit, loading = false }: TreatmentFo
           options={painReliefOptions}
           value={formData.painRelief}
           onChange={handleSelectChange('painRelief')}
-          required
+          required={true}
         />
         
         <SelectField
@@ -204,7 +211,7 @@ export default function TreatmentForm({ onSubmit, loading = false }: TreatmentFo
           options={painWorseOptions}
           value={formData.painWorse}
           onChange={handleSelectChange('painWorse')}
-          required
+          required={true}
         />
 
         <SelectField
@@ -213,7 +220,7 @@ export default function TreatmentForm({ onSubmit, loading = false }: TreatmentFo
           options={interferenceOptions}
           value={formData.interference}
           onChange={handleSelectChange('interference')}
-          required
+          required={true}
         />
 
         <SelectField
@@ -222,7 +229,7 @@ export default function TreatmentForm({ onSubmit, loading = false }: TreatmentFo
           options={sleepQualityOptions}
           value={formData.sleepQuality}
           onChange={handleSelectChange('sleepQuality')}
-          required
+          required={true}
         />
 
         <SelectField
@@ -231,7 +238,7 @@ export default function TreatmentForm({ onSubmit, loading = false }: TreatmentFo
           options={exercisesDoneOptions}
           value={formData.exercisesDone}
           onChange={handleSelectChange('exercisesDone')}
-          required
+          required={true}
         />
 
         <SelectField
@@ -240,15 +247,21 @@ export default function TreatmentForm({ onSubmit, loading = false }: TreatmentFo
           options={exercisesEffectOptions}
           value={formData.exercisesEffect}
           onChange={handleSelectChange('exercisesEffect')}
-          required
+          required={true}
         />
 
         
-
+        {/* 🚨 Estilo do Botão Desabilitado (disabled) e cursor-not-allowed */}
         <button
           type="submit"
-          disabled={loading}
-          className="btn-primary w-full"
+          disabled={isDisabled}
+          className={`
+            btn-primary w-full transition-all duration-200
+            ${isDisabled 
+              && 'opacity-50 cursor-not-allowed' 
+             
+            }
+          `}
         >
           {loading ? 'Salvando...' : 'Salvar Registro'}
         </button>
